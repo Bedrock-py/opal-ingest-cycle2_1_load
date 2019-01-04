@@ -99,7 +99,8 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         'bedrock',
-        'rpy2==2.8.2'
+        'rpy2==2.8.2',
+        'pathlib'
     ],
 
     # List additional groups of dependencies here (e.g. development
