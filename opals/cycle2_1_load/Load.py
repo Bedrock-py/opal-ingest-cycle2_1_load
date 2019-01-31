@@ -9,12 +9,25 @@
 # in whole or in part, is forbidden except by the express written
 # permission of the Georgia Tech Research Institute.
 # ****************************************************************/
-import logging
 import pathlib
 
-from bedrock.core.io import download_file
+import requests
+
 from bedrock.dataloader.utils import *
-from rpy2.robjects import r
+from bedrock.core.io import download_file
+import time
+import csv
+import xlrd
+import re
+import os
+import traceback
+import pandas as pd
+from collections import Counter
+from itertools import islice
+import logging
+import rpy2.robjects as robjects
+from rpy2.robjects import r, pandas2ri
+from rpy2.robjects.packages import importr
 
 
 class Load(Ingest):
@@ -62,7 +75,10 @@ class Load(Ingest):
             # Load these libraries
             r('if (!require("pacman")) install.packages("pacman")')
             r('library ("pacman")')
-            r("pacman::p_load(rstan, rstanarm, ggplot2, Hmisc, httr, bridgesampling)")
+            r("pacman::p_load(rstan, rstanarm, ggplot2, Hmisc, httr, bridgesampling, DT, dplyr, bayesplot, knitr)")
+            r("set.seed(12345)")
+            r("nIter = 10000")
+            r("LOCAL <- TRUE")
 
             # set the paths for reading data files and writing
             data_file_path = filepath + "source"
@@ -77,6 +93,7 @@ class Load(Ingest):
             except Exception as e:
                 logging.error("Could not download boomtown_metadata.csv")
                 logging.error(e)
+                r("save.image()")  # saves to .RData by default
 
             output_path = filepath + "output"
 
